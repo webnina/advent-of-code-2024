@@ -7,12 +7,14 @@ class Dashboard extends LitElement {
     static properties = {
         days: { type: Array },
         selectedDay: { type: Number },
+        currentFileContent: { type: Array }
     };
 
     constructor() {
         super();
         this.days = Array.from({ length: 24 }, (_, i) => i + 1);
         this.selectedDay = 1;
+        this.currentFileContent = [];
     }
 
     handleChange(event) {
@@ -31,6 +33,7 @@ class Dashboard extends LitElement {
                 </option>`
             )}
           </select>
+          <input type="file" @change="${this.readFile}">
           ${this.renderSelectedDay()}
         `;
     }
@@ -39,6 +42,20 @@ class Dashboard extends LitElement {
         switch (this.selectedDay) {
             default:
                 return html`<p>Nothing to see here for day ${this.selectedDay}</p>`;
+        }
+    }
+
+    readFile(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const content = e.target.result;
+                this.currentFileContent = content.split('\n').filter(Boolean);
+            };
+
+            reader.readAsText(file);
         }
     }
 }
